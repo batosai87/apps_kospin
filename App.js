@@ -9,8 +9,10 @@ import {
     TextInput,
     TouchableHighlight
 } from "react-native";
+// @ts-ignore
 import RadioForm from 'react-native-simple-radio-button';
 import DatePicker from 'react-native-datepicker';
+// @ts-ignore
 import Loading from 'react-native-whc-loading';
 
 class App extends Component {
@@ -35,7 +37,7 @@ class App extends Component {
 
 
     render() {
-        const {nama, jk,tgl_lahir,email,telp,pekerjaan } = this.state.formData;
+        const {nama,tgl_lahir,email,telp,pekerjaan } = this.state.formData;
          
 
         return (
@@ -185,13 +187,41 @@ class App extends Component {
                         </TouchableHighlight>
                     </View>
                 </KeyboardAvoidingView>
+                <Loading ref="loading"/>
             </ScrollView>
         );
     }
 
-    _saveData = () => {
-        alert(JSON.stringify(this.state.formData))
-    }
+    _saveData = async () => {
+        // @ts-ignore
+        this.refs.loading.show();
+
+        try {
+            await fetch('https://mywebsite.com/endpoint/', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(this.state.formData),
+        })
+                .then((response) => response.json())
+                .then((responseJson) => {
+                    // return responseJson.movies;
+                    setTimeout(() =>{
+                        // @ts-ignore
+                        this.refs.loading.close();
+                        alert(JSON.stringify(responseJson));
+                    }, 2000);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        } catch (error) {
+            this.refs.loading.close();
+            alert(error);
+        }
+    };
 }
 export default App;
 
