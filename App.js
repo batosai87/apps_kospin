@@ -14,6 +14,9 @@ import RadioForm from 'react-native-simple-radio-button';
 import DatePicker from 'react-native-datepicker';
 // @ts-ignore
 import Loading from 'react-native-whc-loading';
+import Image from 'react-native-image-progress';
+import ProgressBar from 'react-native-progress/Bar';
+
 
 class App extends Component {
     constructor(props) {
@@ -90,8 +93,6 @@ class App extends Component {
                             mode="date"
                             placeholder="select date"
                             format="DD-MM-YYYY"
-                            minDate="2016-05-01"
-                            maxDate="2016-06-01"
                             confirmBtnText="Confirm"
                             cancelBtnText="Cancel"
                             customStyles={{
@@ -197,9 +198,9 @@ class App extends Component {
         this.refs.loading.show();
 
         try {
-            await fetch('https://mywebsite.com/endpoint/', {
+            await fetch('http://10.0.2.2/service.php', {
             method: 'POST',
-            headers: {
+            headers: {  
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
@@ -215,6 +216,8 @@ class App extends Component {
                     }, 2000);
                 })
                 .catch((error) => {
+                    // @ts-ignore
+                    this.refs.loading.close();
                     console.error(error);
                 });
         } catch (error) {
