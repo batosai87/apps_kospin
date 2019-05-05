@@ -16,6 +16,7 @@ import DatePicker from 'react-native-datepicker';
 import Loading from 'react-native-whc-loading';
 import Image from 'react-native-image-progress';
 import ProgressBar from 'react-native-progress/Bar';
+import ImagePicker from 'react-native-image-crop-picker';
 
 
 class App extends Component {
@@ -26,6 +27,7 @@ class App extends Component {
                 { label: 'Pria', value: 0 },
                 { label: 'Wanita', value: 1 }
             ],
+            avatarSrc: {},
             dataPekerjaan: ['Pelajar', 'Wiraswasta', 'Pegawai Negri Sipil'],
             formData: {
                 nama: "",
@@ -38,26 +40,52 @@ class App extends Component {
         }
     }
 
+    _openGalery = () => {
+        ImagePicker.openPicker({
+            width: 300,
+            height: 400,
+            cropping: true
+          }).then(image => {
+            console.log(image);
+            this.setState({
+                avatarSrc: image
+            })
+          });
+    }
 
     render() {
-        const {nama,tgl_lahir,email,telp,pekerjaan } = this.state.formData;
-         
+        // @ts-ignore
+        const { nama, tgl_lahir, email, telp, pekerjaan } = this.state.formData;
+        const sourceUri = this.state.avatarSrc.path
+            ? { uri: this.state.avatarSrc.path  }
+            : require("./src/img/dadu.png")
 
         return (
             <ScrollView>
                 <KeyboardAvoidingView style={styles.container} enabled>
+                    <View style={[styles.row, { alignItems: "center"}]}>
+                        <TouchableHighlight onPress={this._openGalery}>
+                            <Image
+                                source={sourceUri} 
+                                indicator={ProgressBar}
+                                style={{
+                                    width: 150,
+                                    height: 150,
+                                }} />
+                        </TouchableHighlight>
+                    </View>
                     <View style={styles.row}>
                         <Text style={styles.label}>Nama</Text>
                         <TextInput
                             style={styles.txtInput}
                             underlineColorAndroid='blue'
-                            onChangeText={nama => 
+                            onChangeText={nama =>
                                 this.setState(prevState => ({
-                                    formData:{
-                                    ...prevState.formData,
-                                    nama
+                                    formData: {
+                                        ...prevState.formData,
+                                        nama
                                     }
-                                    
+
                                 }))
                             }
                             value={nama}
@@ -73,13 +101,13 @@ class App extends Component {
                             labelStyle={{ paddingRight: 15 }}
                             buttonColor={'#2196f3'}
                             animation={true}
-                            onPress={jk => 
+                            onPress={jk =>
                                 this.setState(prevState => ({
-                                    formData:{
-                                    ...prevState.formData,
-                                    jk
+                                    formData: {
+                                        ...prevState.formData,
+                                        jk
                                     }
-                                    
+
                                 }))
                             }
                         // onPress={(value) => { this.setState({ value: value }) }}
@@ -109,12 +137,13 @@ class App extends Component {
                             }}
                             onDateChange={(tgl_lahir) => {
                                 this.setState(prevState => ({
-                                    formData:{
-                                    ...prevState.formData,
-                                    tgl_lahir
+                                    formData: {
+                                        ...prevState.formData,
+                                        tgl_lahir
                                     }
-                                    
-                                }))                            }}
+
+                                }))
+                            }}
                         />
                     </View>
                     <View style={styles.row}>
@@ -123,13 +152,13 @@ class App extends Component {
                             style={styles.txtInput}
                             underlineColorAndroid='blue'
                             keyboardType="email-address"
-                            onChangeText={email => 
+                            onChangeText={email =>
                                 this.setState(prevState => ({
-                                    formData:{
-                                    ...prevState.formData,
-                                    email
+                                    formData: {
+                                        ...prevState.formData,
+                                        email
                                     }
-                                    
+
                                 }))
                             }
                             value={email}
@@ -143,13 +172,13 @@ class App extends Component {
                             style={styles.txtInput}
                             underlineColorAndroid='blue'
                             keyboardType="phone-pad"
-                            onChangeText={telp => 
+                            onChangeText={telp =>
                                 this.setState(prevState => ({
-                                    formData:{
-                                    ...prevState.formData,
-                                    telp
+                                    formData: {
+                                        ...prevState.formData,
+                                        telp
                                     }
-                                    
+
                                 }))
                             }
                             value={telp}
@@ -166,7 +195,7 @@ class App extends Component {
                                         ...prevState.formData,
                                         pekerjaan
                                     }
-                                 }))
+                                }))
                             }
                         >
                             {this.state.dataPekerjaan.map((item, index) => (
@@ -184,32 +213,42 @@ class App extends Component {
                         <TouchableHighlight
                             onPress={this._saveData}
                             style={styles.btnContainer}>
-                                <Text style={styles.txtBtn} SIMPAN></Text>
+                            <Text style={styles.txtBtn} SIMPAN></Text>
                         </TouchableHighlight>
                     </View>
                 </KeyboardAvoidingView>
-                <Loading ref="loading"/>
+                <Loading ref="loading" />
             </ScrollView>
         );
     }
 
     _saveData = async () => {
         // @ts-ignore
+        let formDataPost = new FormData();
+        const { avatarSrc, formData } = this.state;
+
         this.refs.loading.show();
 
+        for(let p in formData) formDataPost.append(p, formData[p]);
+        // kita masukin imagenya
+        formDataPost.append('photo',{
+            uri : avatarSrc.path,
+            type : avatarSrc. mime,
+            name : 'photo-profil'
+        })
         try {
             await fetch('http://10.0.2.2/service.php', {
-            method: 'POST',
-            headers: {  
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(this.state.formData),
-        })
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'multipart/form-data',
+                },
+                body: formDataPost
+            })
                 .then((response) => response.json())
                 .then((responseJson) => {
                     // return responseJson.movies;
-                    setTimeout(() =>{
+                    setTimeout(() => {
                         // @ts-ignore
                         this.refs.loading.close();
                         alert(JSON.stringify(responseJson));
