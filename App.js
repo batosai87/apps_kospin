@@ -58,7 +58,7 @@ class App extends Component {
         const { nama, tgl_lahir, email, telp, pekerjaan } = this.state.formData;
         const sourceUri = this.state.avatarSrc.path
             ? { uri: this.state.avatarSrc.path  }
-            : require("./src/img/dadu.png")
+            : require("./src/img/noimage.png");
 
         return (
             <ScrollView>
@@ -70,7 +70,7 @@ class App extends Component {
                                 indicator={ProgressBar}
                                 style={{
                                     width: 150,
-                                    height: 150,
+                                    height: 150
                                 }} />
                         </TouchableHighlight>
                     </View>
@@ -233,7 +233,7 @@ class App extends Component {
         // kita masukin imagenya
         formDataPost.append('photo',{
             uri : avatarSrc.path,
-            type : avatarSrc. mime,
+            type : avatarSrc.mime,
             name : 'photo-profil'
         })
         try {
@@ -241,7 +241,7 @@ class App extends Component {
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
-                    'Content-Type': 'multipart/form-data',
+                    'Content-Type': 'multipart/form-data'
                 },
                 body: formDataPost
             })
