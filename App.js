@@ -213,7 +213,7 @@ class App extends Component {
                         <TouchableHighlight
                             onPress={this._saveData}
                             style={styles.btnContainer}>
-                            <Text style={styles.txtBtn} SIMPAN></Text>
+                            <Text style={styles.txtBtn}>SIMPAN</Text>
                         </TouchableHighlight>
                     </View>
                 </KeyboardAvoidingView>
@@ -289,6 +289,6 @@ const styles = StyleSheet.create({
     },
     txtBtn: {
         fontSize: 20,
-        color: "red"
+        color: "white"
     }
 });
